@@ -9,7 +9,7 @@ Install [gflags][] for using the command lines.
 
 ## usage
 
-./objsplit -obj <3dobj> -pc <pointcloud> -o <outputs>
+./objsplit -obj <<3dobj>> -pc <<pointcloud>> -o <<outputs>>
 
 
 [CGAL]: http://www.cgal.org

@@ -1,2 +1,2 @@
 # objsplit
-split 3d object with lines (3d point cloud)
+to split a 3D object by a given point cloud

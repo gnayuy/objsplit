@@ -1,0 +1,8 @@
+# objsplit
+PROJECT(objsplit)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+ADD_SUBDIRECTORY(src)
+
+

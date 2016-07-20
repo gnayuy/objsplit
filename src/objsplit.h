@@ -8,23 +8,10 @@
 //
 #include <gflags/gflags.h>
 
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_face_graph_triangle_primitive.h>
+#include <CGAL/Scale_space_surface_reconstruction_3.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/IO/read_off_points.h>
 #include <CGAL/Timer.h>
-#include <CGAL/trace.h>
-#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
-#include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/Surface_mesh_default_triangulation_3.h>
-#include <CGAL/make_surface_mesh.h>
-#include <CGAL/Poisson_implicit_surface_3.h>
-#include <CGAL/IO/output_surface_facets_to_polyhedron.h>
-#include <CGAL/Poisson_reconstruction_function.h>
-#include <CGAL/Point_with_normal_3.h>
-#include <CGAL/IO/read_xyz_points.h>
-#include <CGAL/compute_average_spacing.h>
-#include <CGAL/Polygon_mesh_processing/compute_normal.h>
 
 #include <deque>
 #include <queue>
@@ -53,7 +40,15 @@
 using namespace std;
 
 // types
+typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
 
+typedef CGAL::Scale_space_surface_reconstruction_3< Kernel >    Reconstruction;
+
+typedef Reconstruction::Point                                   Point;
+typedef std::vector< Point >                                    Point_collection;
+
+typedef Reconstruction::Triple_const_iterator                   Triple_iterator;
+typedef CGAL::Timer Timer;
 
 
 // classes

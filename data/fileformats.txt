@@ -1,6 +1,6 @@
 
 # from http://segeval.cs.princeton.edu/public/off_format.html
-# Object File Format (.off)
+## Object File Format (.off)
 
 Object File Format (.off) files are used to represent the geometry of a model by specifying the polygons of the model's surface. The polygons can have any number of vertices.
 

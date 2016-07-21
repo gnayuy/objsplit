@@ -7,6 +7,8 @@ Install [CGAL][] by following the instructions on their [web site][CGAL].
 
 Install [gflags][] for using the command lines.
 
+Install [ApproxMVBB][] for computing an approximation of the minimal volume oriented bounding box of a point cloud.
+
 ## usage
 
 ./objsplit -obj <$Object> -pc <$PointCloud> -o <$Outputs>
@@ -18,3 +20,4 @@ Install [gflags][] for using the command lines.
 [CGAL]: http://www.cgal.org
 [gflags]: https://github.com/gflags/gflags
 [OFF]: http://www.geomview.org/docs/html/OFF.html#OFF
+[ApproxMVBB]: https://github.com/gabyx/ApproxMVBB

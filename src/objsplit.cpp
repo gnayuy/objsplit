@@ -13,7 +13,9 @@
 DEFINE_string(obj, "", "object input ");
 DEFINE_string(pc, "", "point cloud input .off");
 DEFINE_string(o, "", "output");
-
+DEFINE_int64(minx, 0, "bouding box minx");
+DEFINE_int64(miny, 0, "bouding box miny");
+DEFINE_int64(minz, 0, "bouding box minz");
 
 
 // main func
@@ -28,7 +30,18 @@ int main(int argc, char *argv[])
     std::cout<<"Parameters:"<<std::endl;
     std::cout<<"inputs: \n  <Object>: "<<FLAGS_obj<<" \n  <PointCloud>: "<<FLAGS_pc<<" \noutput: \n  <splitObjects>: "<<FLAGS_o<<std::endl;
     
+    
     //
+    double bx = FLAGS_minx;
+    double by = FLAGS_miny;
+    double bz = FLAGS_minz;
+    
+    ApproxMVBB::Vector3 origin = ApproxMVBB::Vector3(bx, by, bz);
+    
+    cout<<"origin: "<<origin.transpose()<<endl;
+    
+    
+    // points
     Point_collection points;
     std::ifstream in(FLAGS_pc);
     std::cerr << "Reading " << std::flush;
@@ -38,6 +51,59 @@ int main(int argc, char *argv[])
     }
     
     std::cerr << "done: " << points.size() << " points." << std::endl;
+    
+//    for(int i; i<points.size(); i++)
+//    {
+//        cout<<" "<<points[i].x()<<" "<<points[i].y()<<" "<<points[i].z()<<endl;
+//    }
+    
+    // obb
+//    ApproxMVBB::Matrix3Dyn pointSet(3,points.size());
+    
+//    for(int i=0; i<points.size(); i++)
+//    {
+//        pointSet.col(i) = ApproxMVBB::Vector3(points[i].x(),points[i].y(),points[i].z()) - origin;
+//        
+//        cout<<" "<<pointSet.col(i).transpose()<<endl;
+//    }
+    
+
+    ApproxMVBB::Matrix3Dyn pointSet(3,3);
+    
+    pointSet.col(0) = ApproxMVBB::Vector3(25, 25, 25);
+    pointSet.col(1) = ApproxMVBB::Vector3(25, 26, 25);
+    pointSet.col(2) = ApproxMVBB::Vector3(26, 25, 26);
+    
+    ApproxMVBB::OOBB oobb = ApproxMVBB::approximateMVBB(pointSet,0.001,500,5,0,5);
+    
+    std::cout << "Computed OOBB: " << std::endl
+    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
+    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl
+    << "---> coordinate transformation A_IK matrix from OOBB frame K to world frame I" << std::endl
+    << oobb.m_q_KI.matrix() << std::endl
+    << "---> this is also the rotation matrix R_KI  which turns the world frame I into the OOBB frame K" <<std::endl << std::endl;
+    
+    
+    // To make all points inside the OOBB :
+    ApproxMVBB::Matrix33 A_KI = oobb.m_q_KI.matrix().transpose(); // faster to store the transformation matrix first
+    auto size = pointSet.cols();
+    for( unsigned int i=0;  i<size; ++i ) {
+        oobb.unite(A_KI*pointSet.col(i));
+    }
+    std::cout << "OOBB with all point included: " << std::endl
+    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
+    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl;
+    
+
+    ApproxMVBB::Vector3 p = oobb.m_q_KI * oobb.m_minPoint;
+    ApproxMVBB::Vector3 q = oobb.m_q_KI * oobb.m_maxPoint;
+    
+    cout<<"lower point: "<<p.transpose()<<"; upper point: "<<q.transpose()<<endl;
+    
+    
+    
+    
+    
     
     Timer t;
     t.start();
@@ -51,6 +117,20 @@ int main(int argc, char *argv[])
                                     );
     
     std::cerr << "Reconstruction done in " << t.time() << " sec." << std::endl;
+    
+    
+//    for( Triple_iterator it = reconstruct.surface_begin( ); it != reconstruct.surface_end(  ); ++it )
+//    {
+//        //cout << "3 "<< *it << '\n';
+//        
+//        for (auto i:*it)
+//            std::cout << ' ' << points[i].x();
+//        cout<<endl;
+//        
+//        
+//    }
+    
+    
     
     t.reset();
     std::ofstream out(FLAGS_o);

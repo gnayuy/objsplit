@@ -1,4 +1,4 @@
-// objsplit: to split 3D object given a point cloud
+// objsplit: to split a 3D object by a given point cloud
 // Yang Yu (gnayuy@gmail.com)
 
 
@@ -12,6 +12,8 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/read_off_points.h>
 #include <CGAL/Timer.h>
+
+#include <ApproxMVBB/ComputeApproxMVBB.hpp>
 
 #include <deque>
 #include <queue>

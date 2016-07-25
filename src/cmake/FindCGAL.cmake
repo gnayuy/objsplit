@@ -32,13 +32,13 @@ FIND_LIBRARY(CGAL_LIBRARIES
              DOC "The CGAL libraries")
 
 # boost
-find_package(Boost COMPONENTS thread system REQUIRED)
-if(Boost_FOUND)
+FIND_PACKAGE(Boost COMPONENTS thread system iostreams REQUIRED)
+IF(Boost_FOUND)
     set(BOOST_LIBRARIES ${Boost_LIBRARIES})
-endif(Boost_FOUND)
+ENDIF(Boost_FOUND)
 
 # gmp
-find_library(GMP_LIBRARIES
+FIND_LIBRARY(GMP_LIBRARIES
     NAMES gmp libgmp
     PATHS
     ${GMP_ROOT}/lib
@@ -53,7 +53,7 @@ find_library(GMP_LIBRARIES
 )
 
 # mpfr
-find_library(MPFR_LIBRARIES
+FIND_LIBRARY(MPFR_LIBRARIES
     NAMES mpfr libmpfr
     PATHS
     ${MPFR_ROOT}/lib
@@ -66,7 +66,6 @@ find_library(MPFR_LIBRARIES
     $ENV{ProgramFiles}/mpfr/*/lib
     $ENV{SystemDrive}/mpfr/*/lib
 )
-
 
 IF(CGAL_INCLUDE_DIR AND CGAL_LIBRARIES)
     SET(CGAL_FOUND TRUE)

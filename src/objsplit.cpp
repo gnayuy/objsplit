@@ -18,6 +18,41 @@ DEFINE_int64(miny, 0, "bouding box miny");
 DEFINE_int64(minz, 0, "bouding box minz");
 
 
+// OpenVDB I/O class
+VDBIO::VDBIO()
+{
+    openvdb::initialize ();
+    openvdb::Grid<NeuronMaskTree>::registerGrid();
+}
+
+VDBIO::~VDBIO()
+{
+    
+}
+
+void VDBIO::read(char const *filename)
+{
+    openvdb::io::File file(filename);
+    file.open();
+    
+    openvdb::GridPtrVecPtr baseGrids = file.getGrids();
+    if (baseGrids->empty()) {
+        OPENVDB_LOG_WARN(filename << " is empty");
+    }
+    
+    NeuronMaskGrid::Ptr grid = openvdb::gridPtrCast<NeuronMaskGrid>(baseGrids->at(0));
+    NeuronMaskGrid::Accessor accessor = grid->getAccessor();
+    std::cout << "Leaf Nodes: " << grid->tree().leafCount() << std::endl;
+}
+
+void VDBIO::write(char const *filename)
+{
+    openvdb::io::File file (filename);
+    file.write (grids);
+    file.close ();
+}
+
+
 // main func
 int main(int argc, char *argv[])
 {
@@ -36,10 +71,14 @@ int main(int argc, char *argv[])
     double by = FLAGS_miny;
     double bz = FLAGS_minz;
     
-    ApproxMVBB::Vector3 origin = ApproxMVBB::Vector3(bx, by, bz);
-    
-    cout<<"origin: "<<origin.transpose()<<endl;
-    
+//    ApproxMVBB::Vector3 origin = ApproxMVBB::Vector3(bx, by, bz);
+//    
+//    cout<<"origin: "<<origin.transpose()<<endl;
+//    
+//
+    // 3d object
+    VDBIO vdb;
+    vdb.read(const_cast<char*>(FLAGS_obj.c_str()));
     
     // points
     Point_collection points;
@@ -68,37 +107,37 @@ int main(int argc, char *argv[])
 //    }
     
 
-    ApproxMVBB::Matrix3Dyn pointSet(3,3);
-    
-    pointSet.col(0) = ApproxMVBB::Vector3(25, 25, 25);
-    pointSet.col(1) = ApproxMVBB::Vector3(25, 26, 25);
-    pointSet.col(2) = ApproxMVBB::Vector3(26, 25, 26);
-    
-    ApproxMVBB::OOBB oobb = ApproxMVBB::approximateMVBB(pointSet,0.001,500,5,0,5);
-    
-    std::cout << "Computed OOBB: " << std::endl
-    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
-    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl
-    << "---> coordinate transformation A_IK matrix from OOBB frame K to world frame I" << std::endl
-    << oobb.m_q_KI.matrix() << std::endl
-    << "---> this is also the rotation matrix R_KI  which turns the world frame I into the OOBB frame K" <<std::endl << std::endl;
-    
-    
-    // To make all points inside the OOBB :
-    ApproxMVBB::Matrix33 A_KI = oobb.m_q_KI.matrix().transpose(); // faster to store the transformation matrix first
-    auto size = pointSet.cols();
-    for( unsigned int i=0;  i<size; ++i ) {
-        oobb.unite(A_KI*pointSet.col(i));
-    }
-    std::cout << "OOBB with all point included: " << std::endl
-    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
-    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl;
-    
-
-    ApproxMVBB::Vector3 p = oobb.m_q_KI * oobb.m_minPoint;
-    ApproxMVBB::Vector3 q = oobb.m_q_KI * oobb.m_maxPoint;
-    
-    cout<<"lower point: "<<p.transpose()<<"; upper point: "<<q.transpose()<<endl;
+//    ApproxMVBB::Matrix3Dyn pointSet(3,3);
+//    
+//    pointSet.col(0) = ApproxMVBB::Vector3(25, 25, 25);
+//    pointSet.col(1) = ApproxMVBB::Vector3(25, 26, 25);
+//    pointSet.col(2) = ApproxMVBB::Vector3(26, 25, 26);
+//    
+//    ApproxMVBB::OOBB oobb = ApproxMVBB::approximateMVBB(pointSet,0.001,500,5,0,5);
+//    
+//    std::cout << "Computed OOBB: " << std::endl
+//    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
+//    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl
+//    << "---> coordinate transformation A_IK matrix from OOBB frame K to world frame I" << std::endl
+//    << oobb.m_q_KI.matrix() << std::endl
+//    << "---> this is also the rotation matrix R_KI  which turns the world frame I into the OOBB frame K" <<std::endl << std::endl;
+//    
+//    
+//    // To make all points inside the OOBB :
+//    ApproxMVBB::Matrix33 A_KI = oobb.m_q_KI.matrix().transpose(); // faster to store the transformation matrix first
+//    auto size = pointSet.cols();
+//    for( unsigned int i=0;  i<size; ++i ) {
+//        oobb.unite(A_KI*pointSet.col(i));
+//    }
+//    std::cout << "OOBB with all point included: " << std::endl
+//    << "---> lower point in OOBB frame: " << oobb.m_minPoint.transpose() << std::endl
+//    << "---> upper point in OOBB frame: " << oobb.m_maxPoint.transpose() << std::endl;
+//    
+//
+//    ApproxMVBB::Vector3 p = oobb.m_q_KI * oobb.m_minPoint;
+//    ApproxMVBB::Vector3 q = oobb.m_q_KI * oobb.m_maxPoint;
+//    
+//    cout<<"lower point: "<<p.transpose()<<"; upper point: "<<q.transpose()<<endl;
     
     
     

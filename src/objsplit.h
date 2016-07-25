@@ -13,7 +13,22 @@
 #include <CGAL/IO/read_off_points.h>
 #include <CGAL/Timer.h>
 
-#include <ApproxMVBB/ComputeApproxMVBB.hpp>
+//#include <ApproxMVBB/ComputeApproxMVBB.hpp>
+
+#include <openvdb/openvdb.h>
+#include <openvdb/Types.h>
+#include <openvdb/util/Util.h>
+#include <openvdb/math/Math.h>
+#include <openvdb/math/Transform.h>
+#include <openvdb/tools/LevelSetUtil.h>
+#include <openvdb/tools/MeshToVolume.h>
+#include <openvdb/tools/VolumeToMesh.h>
+#include <openvdb/tools/ParticlesToLevelSet.h>
+#include <openvdb/tools/Prune.h>
+#include <openvdb/tools/MaskToLevelSet.h>
+#include <openvdb/tools/Interpolation.h>
+#include <openvdb/tools/GridTransformer.h>
+#include <openvdb/io/Stream.h>
 
 #include <deque>
 #include <queue>
@@ -55,6 +70,24 @@ typedef CGAL::Timer Timer;
 
 // classes
 
+typedef openvdb::tree::Tree5<bool, 5, 2, 2, 3>::Type  NeuronMaskTree;
+typedef openvdb::Grid<NeuronMaskTree>                 NeuronMaskGrid;
+
+// OpenVDB I/O
+class VDBIO
+{
+public:
+    VDBIO();
+    ~VDBIO();
+    
+public:
+    void read(char const *filename);
+    void write(char const *filename);
+    
+public:
+    openvdb::GridPtrVec grids;
+    
+};
 
 
 #endif // __OBJSPLIT_H__
